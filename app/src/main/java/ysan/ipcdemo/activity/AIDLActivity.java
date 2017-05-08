@@ -154,6 +154,7 @@ public class AIDLActivity extends AppCompatActivity implements View.OnClickListe
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
+
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
