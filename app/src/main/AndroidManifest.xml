@@ -16,6 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".activity.AIDLActivity"/>
+        <activity android:name=".activity.MessengerActivity"/>
     </application>
 
 </manifest>

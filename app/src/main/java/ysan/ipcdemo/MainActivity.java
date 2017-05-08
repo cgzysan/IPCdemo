@@ -1,96 +1,52 @@
 package ysan.ipcdemo;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+
+import ysan.ipcdemo.activity.AIDLActivity;
+import ysan.ipcdemo.activity.MessengerActivity;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private TextView mIPCinfo;
+
+    private Button mByMessenger;
+    private Button mByAidl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button hello = (Button) findViewById(R.id.hello_world);
-        mIPCinfo = (TextView) findViewById(R.id.IPC_info);
-        hello.setOnClickListener(this);
+        initView();
+        initEvent();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        //绑定服务端的服务，此处的action是service在Manifests文件里面声明的
-        Intent intent = new Intent();
-        intent.setAction("com.ysan.servicec");
-        //不要忘记了包名，不写会报错
-        intent.setPackage("ysan.servicedemo");
-        bindService(intent, mConnectionC, BIND_AUTO_CREATE);
+    private void initEvent() {
+        mByMessenger.setOnClickListener(this);
+        mByAidl.setOnClickListener(this);
     }
 
-    class clientHandler extends Handler {
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 210:
-                    Log.i("ysan", "收到IPC反馈消息");
-                    mIPCinfo.setText("hi,nice to meet you!");
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
+    private void initView() {
+        mByMessenger = (Button) findViewById(R.id.bt_messenger);
+        mByAidl = (Button) findViewById(R.id.bt_aidl);
     }
 
-    Messenger clientMessenger = new Messenger(new clientHandler());
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.hello_world:
-                if (mBound_C) {
-                    Message msg = Message.obtain(null, 110, 0, 0);
-                    msg.replyTo = clientMessenger;
-                    try {
-                        mService.send(msg);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                }
-
+            case R.id.bt_messenger:
+                startActivity(new Intent(MainActivity.this, MessengerActivity.class));
+                break;
+            case R.id.bt_aidl:
+                startActivity(new Intent(MainActivity.this, AIDLActivity.class));
                 break;
             default:
                 break;
         }
     }
-
-    Messenger mService = null;
-    boolean mBound_C = false;
-
-    public ServiceConnection mConnectionC = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = new Messenger(service);
-            mBound_C = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mBound_C = false;
-        }
-    };
 }
