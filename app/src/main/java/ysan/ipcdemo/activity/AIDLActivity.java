@@ -11,18 +11,19 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import ysan.aidldemo.Book;
-import ysan.aidldemo.BookManager;
+import ysan.aidldemo.aidl.MusicCallback;
+import ysan.aidldemo.aidl.MusicInfo;
+import ysan.aidldemo.aidl.MusicManager;
+import ysan.aidldemo.aidl.MusicSceneInfo;
 import ysan.ipcdemo.R;
+
 
 /**
  * Created by YSAN on 2017/05/08 09:19
@@ -32,16 +33,15 @@ import ysan.ipcdemo.R;
 public class AIDLActivity extends AppCompatActivity implements View.OnClickListener {
 
     //由AIDL文件生成的Java类
-    private BookManager mBookManager = null;
-
+    private MusicManager mMusicManager = null;
     //标志当前与服务端连接状况的布尔值，false为未连接，true为连接中
     private boolean mBound = false;
 
     //包含Book对象的list
-    private List<Book> mBooks;
     private Button mAddBook;
     private ListView mBookList;
-    private BookAdapter mAdapter;
+    private Button mSend;
+    private TextView mResult;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,12 +50,6 @@ public class AIDLActivity extends AppCompatActivity implements View.OnClickListe
 
         initView();
         initEvent();
-        initData();
-    }
-
-    private void initData() {
-        mAdapter = new BookAdapter();
-        mBookList.setAdapter(mAdapter);
     }
 
     @Override
@@ -77,40 +71,13 @@ public class AIDLActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initEvent() {
         mAddBook.setOnClickListener(this);
+        mSend.setOnClickListener(this);
     }
 
     private void initView() {
         mAddBook = (Button) findViewById(R.id.add_book);
-        mBookList = (ListView) findViewById(R.id.book_list);
-    }
-
-    class BookAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            if (mBooks != null) {
-                return mBooks.size();
-            }
-            return 0;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView info = new TextView(AIDLActivity.this);
-            Book bookInfo = mBooks.get(position);
-            info.setText("书名 ：" + bookInfo.getName() + "价格 ：" + bookInfo.getPrice());
-            return info;
-        }
+        mSend = (Button) findViewById(R.id.send_music);
+        mResult = (TextView) findViewById(R.id.text_result);
     }
 
     @Override
@@ -118,24 +85,21 @@ public class AIDLActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.add_book:
                 //如果与服务端的连接处于未连接状态，则尝试连接
-                if (!mBound) {
-                    attemptToBindService();
-                    Toast.makeText(this, "当前与服务端处于未连接状态，正在尝试重连，请稍后再试", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (mBookManager == null)
-                    return;
-
-                Book book = new Book();
-                book.setPrice(67);
-                book.setName("越狱");
+                attemptToBindService();
+                return;
+            case R.id.send_music:
+                //发送歌曲
+                MusicInfo musicInfo = new MusicInfo();
+                List<MusicInfo> mList = new ArrayList<>();
+                mList.add(musicInfo);
+                MusicSceneInfo info = new MusicSceneInfo();
+                info.setSongName("忘情水");
+                info.setSinger("刘德华");
+                info.setList(mList);
                 try {
-                    mBookManager.addBook(book);
-                    mBooks = mBookManager.getBooks();
-                    mAdapter.notifyDataSetChanged();
-                    Log.i("ysan", "book : " + book.toString() + "=== mBooks : " + mBooks.toString());
+                    mMusicManager.dealResult(info);
                 } catch (RemoteException e) {
+                    Log.i("ysan", "Client dealResult Exception");
                     e.printStackTrace();
                 }
                 break;
@@ -159,13 +123,13 @@ public class AIDLActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.i("ysan", "AIDLService connected");
-            mBookManager = BookManager.Stub.asInterface(service);
+            mMusicManager = MusicManager.Stub.asInterface(service);
+
             mBound = true;
 
-            if (mBookManager != null) {
+            if (mMusicManager != null) {
                 try {
-                    mBooks = mBookManager.getBooks();
-                    Log.i("ysan", "mBooks : " + mBooks.toString());
+                    mMusicManager.registerCallback(mCallback);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -176,6 +140,20 @@ public class AIDLActivity extends AppCompatActivity implements View.OnClickListe
         public void onServiceDisconnected(ComponentName name) {
             Log.i("ysan", "AIDLService disconnected");
             mBound = false;
+        }
+    };
+
+    private MusicCallback.Stub mCallback = new MusicCallback.Stub() {
+        @Override
+        public void onSuccess(String result) throws RemoteException {
+            Log.i("ysan", "Client onSuccess >> result = " + result);
+            mResult.setText(result);
+        }
+
+        @Override
+        public void onFailure(String error) throws RemoteException {
+            Log.i("ysan", "Client onFailure >> error" + error);
+            mResult.setText(error);
         }
     };
 }

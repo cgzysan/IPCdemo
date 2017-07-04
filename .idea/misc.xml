@@ -3,12 +3,11 @@
   <component name="EclipseCodeFormatter">
     <option name="defaultSettings" value="true" />
     <option name="id" value="1438764167832" />
-    <option name="importOrderConfigFilePath" value="D:/WorkSpace/ysan_eclipse_formatter_2016_7_26.xml" />
+    <option name="importOrderConfigFilePath" value="D:/Y/AS/formatter/UniNDP FormatterTemplates.xml" />
     <option name="importOrderFromFile" value="true" />
     <option name="name" value="default" />
-    <option name="pathToConfigFileJava" value="D:/WorkSpace/ysan_eclipse_formatter_2016_7_26.xml" />
-    <option name="selectedJavaProfile" value="Spring" />
-    <option name="useOldEclipseJavaFormatter" value="true" />
+    <option name="pathToConfigFileJava" value="D:/Y/AS/formatter/UniNDP FormatterTemplates.xml" />
+    <option name="selectedJavaProfile" value="UniNDP" />
   </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />

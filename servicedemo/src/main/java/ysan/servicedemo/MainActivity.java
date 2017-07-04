@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     int num = mMServiceB.getNum();
                     mInfo1.setText(num + "");
                 }
-                if (mBound_C) {
+                if (mBound_C)   {
                     Message message = Message.obtain(null, 110, 0, 0);
                     try {
                         mService.send(message);
