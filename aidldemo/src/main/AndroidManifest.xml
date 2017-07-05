@@ -17,6 +17,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".MusicActivity"/>
+
         <service
             android:name=".AIDLService"
             android:exported="true">

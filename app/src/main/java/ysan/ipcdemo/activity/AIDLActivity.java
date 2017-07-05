@@ -42,6 +42,13 @@ public class AIDLActivity extends AppCompatActivity implements View.OnClickListe
     private ListView mBookList;
     private Button mSend;
     private TextView mResult;
+    private Button mSpeed;
+    private Button mRewind;
+    private Button mNext;
+    private Button mPre;
+    private Button mRandom;
+    private Button mList;
+    private Button mSinger;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,39 +79,75 @@ public class AIDLActivity extends AppCompatActivity implements View.OnClickListe
     private void initEvent() {
         mAddBook.setOnClickListener(this);
         mSend.setOnClickListener(this);
+        mSpeed.setOnClickListener(this);
+        mRewind.setOnClickListener(this);
+        mNext.setOnClickListener(this);
+        mPre.setOnClickListener(this);
+        mRandom.setOnClickListener(this);
+        mList.setOnClickListener(this);
+        mSinger.setOnClickListener(this);
+        mResult.setOnClickListener(this);
     }
 
     private void initView() {
         mAddBook = (Button) findViewById(R.id.add_book);
         mSend = (Button) findViewById(R.id.send_music);
+        mSpeed = (Button) findViewById(R.id.music_speed);
+        mRewind = (Button) findViewById(R.id.music_rewind);
+        mNext = (Button) findViewById(R.id.music_next);
+        mPre = (Button) findViewById(R.id.music_pre);
+        mRandom = (Button) findViewById(R.id.music_random);
+        mList = (Button) findViewById(R.id.music_list);
+        mSinger = (Button) findViewById(R.id.music_singer);
         mResult = (TextView) findViewById(R.id.text_result);
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.add_book:
-                //如果与服务端的连接处于未连接状态，则尝试连接
-                attemptToBindService();
-                return;
-            case R.id.send_music:
-                //发送歌曲
-                MusicInfo musicInfo = new MusicInfo();
-                List<MusicInfo> mList = new ArrayList<>();
-                mList.add(musicInfo);
-                MusicSceneInfo info = new MusicSceneInfo();
-                info.setSongName("忘情水");
-                info.setSinger("刘德华");
-                info.setList(mList);
-                try {
+        try {
+            switch (v.getId()) {
+                case R.id.add_book:
+                    //如果与服务端的连接处于未连接状态，则尝试连接
+                    attemptToBindService();
+                    return;
+                case R.id.send_music:
+                    //发送歌曲
+                    MusicInfo musicInfo = new MusicInfo();
+                    List<MusicInfo> mList = new ArrayList<>();
+                    mList.add(musicInfo);
+                    MusicSceneInfo info = new MusicSceneInfo();
+                    info.setSongName("忘情水");
+                    info.setSinger("刘德华");
+                    info.setList(mList);
                     mMusicManager.dealResult(info);
-                } catch (RemoteException e) {
-                    Log.i("ysan", "Client dealResult Exception");
-                    e.printStackTrace();
-                }
-                break;
-            default:
-                break;
+                    break;
+                case R.id.music_speed:
+                    mMusicManager.dealOpration("快进");
+                    break;
+                case R.id.music_rewind:
+                    mMusicManager.dealOpration("快退");
+                    break;
+                case R.id.music_next:
+                    mMusicManager.dealOpration("下一首");
+                    break;
+                case R.id.music_pre:
+                    mMusicManager.dealOpration("上一首");
+                    break;
+                case R.id.music_list:
+                    mMusicManager.dealOpration("列表循环");
+                    break;
+                case R.id.music_random:
+                    mMusicManager.dealOpration("循环播放");
+                    break;
+                case R.id.music_singer:
+                    mMusicManager.dealOpration("单曲循环");
+                    break;
+                default:
+                    break;
+            }
+        } catch (RemoteException e) {
+            Log.i("ysan", "Client dealResult Exception");
+            e.printStackTrace();
         }
     }
 
