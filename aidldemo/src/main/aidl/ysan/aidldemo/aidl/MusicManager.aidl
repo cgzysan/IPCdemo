@@ -10,5 +10,5 @@ import ysan.aidldemo.aidl.MusicCallback;
 interface MusicManager {
     void registerCallback(MusicCallback callback);
     void dealResult(in MusicSceneInfo res);
-    void dealOpration(String optator);
+    void dealOperation(String opetator);
 }

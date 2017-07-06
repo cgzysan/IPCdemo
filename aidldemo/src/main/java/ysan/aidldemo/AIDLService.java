@@ -40,7 +40,7 @@ public class AIDLService extends Service {
         }
 
         @Override
-        public void dealOpration(String operation) throws RemoteException {
+        public void dealOperation(String operation) throws RemoteException {
             Log.i("ysan", "发送 operation = " + operation);
             Intent intent = new Intent("music_operation");
             intent.putExtra("operation", operation);
