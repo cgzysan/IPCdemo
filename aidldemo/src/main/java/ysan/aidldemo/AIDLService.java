@@ -34,9 +34,11 @@ public class AIDLService extends Service {
         @Override
         public void dealResult(MusicSceneInfo res) throws RemoteException {
             Log.i("ysan", "service dealResult" + res.getSongName());
-            Intent intent = new Intent("start_music");
+            Intent intent = new Intent(getBaseContext(), MusicActivity.class);
+            /**从Service启动Activity需要加的flag*/
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("music", res);
-            sendBroadcast(intent);
+            getApplication().startActivity(intent);
         }
 
         @Override
